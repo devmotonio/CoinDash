@@ -1,13 +1,14 @@
 extends Node
 
 export (PackedScene) var Coin
+export (PackedScene) var PowerUp
 export (int) var Playtime
 
-var Level
-var Score
-var TimeLeft
-var ScreenSize
-var Playing = false
+var level
+var score
+var timeleft
+var screensize
+var playing = false
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -16,52 +17,67 @@ var Playing = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	randomize()
-	ScreenSize = get_viewport().get_visible_rect().size
-	$Player.ScreenSize = ScreenSize
-	$Player.hide()
-	$Hud.game_ready()
+	screensize = get_viewport().get_visible_rect().size
+	$Player.init(screensize)
+	$Hud.init()
 
 func new_game():
-	Playing = true
-	Level = 1
-	Score = 0
-	TimeLeft = Playtime
-	spawn_coins()
+	playing = true
+	level = 1
+	score = 0
+	timeleft = Playtime
+	$Hud.start(score,timeleft)
 	$Player.start($PlayerStart.position)
-	$Player.show()
+	spawn_coins()
+	$StartSound.play()
 	$GameTimer.start()
+	$PowerUpTimer.start()
 
 func spawn_coins():
-	for i in range(4 + Level):
+	for i in range(4 + level):
 		var c = Coin.instance()
 		$CoinContainer.add_child(c)
-		c.screensize = ScreenSize
-		c.position = Vector2(rand_range(0,ScreenSize.x),rand_range(0,ScreenSize.y))
+		c.screensize = screensize
+		c.position = Vector2(rand_range(0,screensize.x),rand_range(0,screensize.y))
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if Playing and $CoinContainer.get_child_count() == 0:
-		Level += 1
-		TimeLeft += 5
+	if playing and $CoinContainer.get_child_count() == 0:
+		level += 1
+		timeleft += 5
 		spawn_coins()
 
 func _on_GameTimer_timeout():
-	TimeLeft -= 1
-	$Hud.update_time(TimeLeft)
-	if TimeLeft < 0:
+	timeleft -= 1
+	$Hud.update_time(timeleft)
+	if timeleft < 0:
 		game_over()
 
-func _on_Player_pickup():
-	Score += 1
-	$Hud.update_score(Score)
-
-func _on_Player_hurt():
-	game_over()
+func _on_Player_pickup(type):
+	match type:
+		"coin":
+			score += 1
+			$Hud.update_score(score)
+		"powerup":
+			print("powerup")
+		_:
+			print("default")
 
 func game_over():
-	Playing = false
+	$EndSound.play()
+	playing = false
 	$GameTimer.stop()
+	$PowerUpTimer.stop()
 	for coin in $CoinContainer.get_children():
-			coin.queue_free()
-	$Hud.game_over()
-	$Player.die()
+		coin.queue_free()
+	$Hud.finish()
+	$Player.finish()
+
+func _on_PowerUpTimer_timeout():
+	print("PowerUpTimer_timeout")
+	var p = PowerUp.instance()
+	add_child(p)
+	p.screensize = screensize
+	p.position = Vector2(rand_range(0,screensize.x),rand_range(0,screensize.y))
+	$PowerUpTimer.wait_time = rand_range(5,10)
+	$PowerUpTimer.start()

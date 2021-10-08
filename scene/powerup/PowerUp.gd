@@ -1,5 +1,6 @@
 extends Area2D
 
+
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
@@ -20,14 +21,19 @@ func _ready():
 	1.2,
 	Tween.TRANS_QUAD,
 	Tween.EASE_IN_OUT)
+	$PickUpSound.play()
+	$ShowTimer.start()
+	
+func pickup(area):
+	set_deferred("monitoring",false)
+	$Tween.start()
+
+func _on_ShowTimer_timeout():
+	queue_free()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
-func pickup(area):
-	set_deferred("monitoring",false)
-	$PickUpSound.play()
-	$Tween.start()
 
-func _on_Tween_tween_completed(object, key):
-	queue_free()
+
+

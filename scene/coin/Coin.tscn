@@ -1,12 +1,13 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://scene/coin/Coin.tres" type="SpriteFrames" id=1]
+[ext_resource path="res://assets/Coin.tres" type="SpriteFrames" id=1]
 [ext_resource path="res://scene/coin/Coin.gd" type="Script" id=2]
+[ext_resource path="res://assets/audio/Coin.wav" type="AudioStream" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
 
 [node name="Coin" type="Area2D" groups=[
-"coins",
+"coin",
 ]]
 script = ExtResource( 2 )
 __meta__ = {
@@ -17,7 +18,16 @@ __meta__ = {
 scale = Vector2( 0.2, 0.2 )
 frames = ExtResource( 1 )
 animation = "main"
+frame = 10
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
+
+[node name="Tween" type="Tween" parent="."]
+
+[node name="PickUpSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 3 )
+
+[connection signal="area_entered" from="." to="." method="pickup"]
+[connection signal="tween_completed" from="Tween" to="." method="_on_Tween_tween_completed"]

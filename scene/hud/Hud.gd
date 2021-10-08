@@ -29,21 +29,20 @@ func _on_MessageTimer_timeout():
 	$MessageLabel.hide()
 
 func _on_Button_pressed():
-	game_start()
 	emit_signal("start_game")
 
-func game_start():
-	update_score(0)
-	update_time(0)
+func start(Score,TimeLeft):
+	update_score(Score)
+	update_time(TimeLeft)
 	$MessageLabel.hide()
 	$StartButton.hide()
 
-func game_over():
+func finish():
 	show_message("Game Over")
 	yield($MessageTimer,"timeout")
-	game_ready()
-
-func game_ready():
+	init()
+	
+func init():
 	$StartButton.show()
 	$MessageLabel.text = "Coin Dash!"
 	$MessageLabel.show()
