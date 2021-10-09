@@ -2,12 +2,13 @@ extends Node
 
 export (PackedScene) var Coin
 export (PackedScene) var PowerUp
+export (PackedScene) var Cactus
 export (int) var Playtime
 
-var level
-var score
-var timeleft
-var screensize
+var level = 0
+var score = 0
+var timeleft = 0
+var screensize = Vector2()
 var playing = false
 
 # Declare member variables here. Examples:
@@ -29,16 +30,24 @@ func new_game():
 	$Hud.start(score,timeleft)
 	$Player.start($PlayerStart.position)
 	spawn_coins()
+	spawn_cactus()
 	$StartSound.play()
 	$GameTimer.start()
 	$PowerUpTimer.start()
 
+func spawn_cactus():
+	var stop = rand_range(3,9)
+	for i in range(stop):
+		var c = Cactus.instance()
+		c.position = Vector2(rand_range(0,screensize.x),rand_range(0,screensize.y))
+		$CactusContainer.add_child(c)
+
 func spawn_coins():
 	for i in range(4 + level):
 		var c = Coin.instance()
-		$CoinContainer.add_child(c)
 		c.screensize = screensize
 		c.position = Vector2(rand_range(0,screensize.x),rand_range(0,screensize.y))
+		$CoinContainer.add_child(c)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -59,7 +68,7 @@ func _on_Player_pickup(type):
 			score += 1
 			$Hud.update_score(score)
 		"powerup":
-			print("powerup")
+			timeleft += 5
 		_:
 			print("default")
 
@@ -70,14 +79,14 @@ func game_over():
 	$PowerUpTimer.stop()
 	for coin in $CoinContainer.get_children():
 		coin.queue_free()
+	for cactus in $CactusContainer.get_children():
+		cactus.queue_free()
 	$Hud.finish()
 	$Player.finish()
 
 func _on_PowerUpTimer_timeout():
-	print("PowerUpTimer_timeout")
 	var p = PowerUp.instance()
 	add_child(p)
-	p.screensize = screensize
 	p.position = Vector2(rand_range(0,screensize.x),rand_range(0,screensize.y))
 	$PowerUpTimer.wait_time = rand_range(5,10)
 	$PowerUpTimer.start()

@@ -6,7 +6,9 @@
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 10, 11.1739 )
 
-[node name="Player" type="Area2D"]
+[node name="Player" type="Area2D" groups=[
+"player",
+]]
 script = ExtResource( 2 )
 __meta__ = {
 "_edit_group_": true
@@ -16,14 +18,11 @@ speed = 250
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = ExtResource( 1 )
 animation = "run"
-frame = 1
+frame = 2
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2( 0, 5 )
 shape = SubResource( 1 )
 
-[node name="Tween" type="Tween" parent="."]
-
 [connection signal="area_entered" from="." to="." method="_on_Player_area_entered"]
-[connection signal="tween_all_completed" from="Tween" to="." method="_on_Tween_tween_all_completed"]

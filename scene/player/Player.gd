@@ -11,22 +11,10 @@ export (int) var speed
 
 var moveto = Vector2()
 var screensize = Vector2()
-var rescale = 1.2
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$Tween.interpolate_property($AnimatedSprite,
-	"scale",
-	$AnimatedSprite.scale,
-	$AnimatedSprite.scale*rescale,
-	0.3,
-	Tween.TRANS_QUAD)
-	$Tween.interpolate_property($CollisionShape2D,
-	"scale",
-	self.scale,
-	self.scale*rescale,
-	0.3,
-	Tween.TRANS_QUAD)
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -58,9 +46,8 @@ func _on_Player_area_entered(area):
 	if area.is_in_group("coin"):
 		emit_signal("pickup","coin")
 	if area.is_in_group("powerup"):
-		$Tween.start()
 		emit_signal("pickup","powerup")
-	if area.is_in_group("obstacles"):
+	if area.is_in_group("obstacle"):
 		emit_signal("hurt")
 
 func start(pos):
@@ -78,7 +65,3 @@ func init(paramscreensize):
 	self.scale = Vector2(1,1)
 	$AnimatedSprite.scale = Vector2(1,1)
 	hide()
-
-func _on_Tween_tween_all_completed():
-	$CollisionShape2D.scale *= rescale
-	$AnimatedSprite.scale *= rescale

@@ -9,6 +9,7 @@
 [node name="Coin" type="Area2D" groups=[
 "coin",
 ]]
+position = Vector2( -0.187294, 0.374577 )
 script = ExtResource( 2 )
 __meta__ = {
 "_edit_group_": true
@@ -29,5 +30,8 @@ shape = SubResource( 1 )
 [node name="PickUpSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 3 )
 
+[node name="AnimationTimer" type="Timer" parent="."]
+
 [connection signal="area_entered" from="." to="." method="pickup"]
 [connection signal="tween_completed" from="Tween" to="." method="_on_Tween_tween_completed"]
+[connection signal="timeout" from="AnimationTimer" to="." method="_on_AnimationTimer_timeout"]
